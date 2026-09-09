@@ -32,7 +32,7 @@
         .slide.active {
             opacity: 1; visibility: visible;
         }
-        .slide img {
+        .slide img, .slide video {
             width: 100%; height: 100%; object-fit: contain;
         }
         /* Кнопка-сердце на обложке */
@@ -59,7 +59,7 @@
 </head>
 <body>
 
-    <!-- Аудиофайл твоей песни -->
+    <!-- Фоновая музыка -->
     <audio id="bg-music" src="music.mp3" loop></audio>
 
     <div class="phone-container">
@@ -67,37 +67,42 @@
         <div class="slide active" id="slide-0">
             <img src="0.png" alt="Обложка">
             <div class="start-btn" onclick="startExperience()">
-                <!-- Невидимая кликабельная зона ровно поверх твоего сердца по центру -->
                 <div style="width: 160px; height: 160px;"></div>
             </div>
         </div>
 
-        <!-- Контейнер для остальных карточек -->
+        <!-- Контейнер для остальных карточек и видео -->
         <div id="dynamic-slides"></div>
     </div>
 
     <script {nonce}>
-        // У тебя 23 картинки (от 0.png до 22.png), всего 23 слайда
-        const totalSlides = 23; 
+        // Теперь у нас 24 слайда (0.png до 22.png + 1 слайд под финальное видео)
+        const totalSlides = 24; 
         
         let currentSlide = 0;
         const music = document.getElementById('bg-music');
         const container = document.getElementById('dynamic-slides');
 
-        // Автоматически создаем слайды со стрелочками
+        // Автоматически создаем слайды
         for (let i = 1; i < totalSlides; i++) {
             const slide = document.createElement('div');
             slide.className = 'slide';
             slide.id = `slide-${i}`;
             
-            // Если это последняя страница (22.png), кнопки Вперед не будет
-            const nextButton = (i === totalSlides - 1) ? '' : `<button class="nav-btn next-btn" onclick="changeSlide(1)">→</button>`;
-            
-            slide.innerHTML = `
-                <img src="${i}.png" alt="Причина ${i}">
-                <button class="nav-btn prev-btn" onclick="changeSlide(-1)">←</button>
-                ${nextButton}
-            `;
+            // Если это САМЫЙ последний слайд (номер 23), вставляем живое видео без кнопки Вперед
+            if (i === totalSlides - 1) {
+                slide.innerHTML = `
+                    <video src="final_video.mp4" autoplay loop muted playsinline></video>
+                    <button class="nav-btn prev-btn" onclick="changeSlide(-1)">←</button>
+                `;
+            } else {
+                // Для всех остальных слайдов (включая твою последнюю картинку 22.png) оставляем обычную логику
+                slide.innerHTML = `
+                    <img src="${i}.png" alt="Причина ${i}">
+                    <button class="nav-btn prev-btn" onclick="changeSlide(-1)">←</button>
+                    <button class="nav-btn next-btn" onclick="changeSlide(1)">→</button>
+                `;
+            }
             container.appendChild(slide);
         }
 
