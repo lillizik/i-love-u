@@ -13,7 +13,6 @@
             font-family: 'Helvetica Neue', Arial, sans-serif;
             overflow: hidden; position: relative;
         }
-        /* Текстура матового шума */
         body::before {
             content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             opacity: 0.04; pointer-events: none; z-index: 10;
@@ -35,14 +34,12 @@
         .slide img, .slide video {
             width: 100%; height: 100%; object-fit: contain;
         }
-        /* Кнопка-сердце на обложке */
         .start-btn {
             position: absolute; bottom: 12%; left: 50%;
             transform: translateX(-50%);
             background: none; border: none; cursor: pointer;
             z-index: 5; display: flex; flex-direction: column; align-items: center;
         }
-        /* Кнопки Назад / Вперед на страницах */
         .nav-btn {
             position: absolute; bottom: 5%; width: 60px; height: 60px;
             background: rgba(255, 255, 255, 0.4);
@@ -59,8 +56,7 @@
 </head>
 <body>
 
-    <!-- Фоновая музыка -->
-    <audio id="bg-music" src="music.mp3" loop></audio>
+    <audio id="bg-music" loop></audio>
 
     <div class="phone-container">
         <!-- ОБЛОЖКА (Слайд 0) -->
@@ -71,53 +67,90 @@
             </div>
         </div>
 
-        <!-- Контейнер для остальных карточек и видео -->
         <div id="dynamic-slides"></div>
     </div>
 
     <script {nonce}>
-        // Теперь у нас 24 слайда (0.png до 22.png + 1 слайд под финальное видео)
-        const totalSlides = 24; 
-        
+        // НАШ ИСПРАВЛЕННЫЙ ПОРЯДОК КАРТИНОК ИЗ ТВОЕГО СПИСКА
+        // Сюда автоматически подставятся нужные имена файлов, чтобы восстановить структуру
+        const order = [
+            4,   // Вместо 3 покажет 4
+            5,   // Вместо 4 покажет 5
+            6,   // Вместо 5 покажет 6
+            7,   // Вместо 6 покажет 7
+            8,   // Вместо 7 покажет 8
+            9,   // Вместо 8 покажет 9
+            10,  // Вместо 9 покажет 10
+            12,  // Вместо 11 покажет 12
+            11,  // Вместо 12 покажет 11
+            3,   // Вместо 13 покажет ту самую потерявшуюся 3
+            13,  // Вместо 14 покажет 13
+            14,  // Вместо 15 покажет 14
+            15,  // Вместо 16 покажет 15
+            16,  // Вместо 17 покажет 16
+            17,  // Вместо 18 покажет 17
+            19,  // Вместо 19 покажет 18 (по твоей логике сдвига)
+            18,  // Вместо 20 покажет 19
+            20,  // Вместо 21 покажет 20
+            21,  // Предпоследняя 21
+            22   // Твой красивый финал «Потому что ты — это ты»
+        ];
+
         let currentSlide = 0;
         const music = document.getElementById('bg-music');
         const container = document.getElementById('dynamic-slides');
 
-        // Автоматически создаем слайды
-        for (let i = 1; i < totalSlides; i++) {
+        // Генерируем слайды по нашему хитрому массиву порядка
+        for (let i = 0; i < order.length; i++) {
             const slide = document.createElement('div');
             slide.className = 'slide';
-            slide.id = `slide-${i}`;
+            slide.id = `slide-${i + 1}`; // ID слайдов пойдут по порядку: 1, 2, 3...
             
-            // Если это САМЫЙ последний слайд (номер 23), вставляем живое видео без кнопки Вперед
-            if (i === totalSlides - 1) {
-                slide.innerHTML = `
-                    <video src="final_video.mp4" autoplay loop muted playsinline></video>
-                    <button class="nav-btn prev-btn" onclick="changeSlide(-1)">←</button>
+            slide.innerHTML = `
+                <img src="${order[i]}.png" alt="Причина">
+                <button class="nav-btn prev-btn" onclick="changeSlide(-1)">←</button>
+                <button class="nav-btn next-btn" onclick="changeSlide(1)">→</button>
                 `;
-            } else {
-                // Для всех остальных слайдов (включая твою последнюю картинку 22.png) оставляем обычную логику
-                slide.innerHTML = `
-                    <img src="${i}.png" alt="Причина ${i}">
-                    <button class="nav-btn prev-btn" onclick="changeSlide(-1)">←</button>
-                    <button class="nav-btn next-btn" onclick="changeSlide(1)">→</button>
-                `;
-            }
             container.appendChild(slide);
         }
 
-        // Включение музыки по первому клику и переход к Причине 1
+        // Самый последний слайд — твое живое видео
+        const videoSlide = document.createElement('div');
+        videoSlide.className = 'slide';
+        videoSlide.id = `slide-${order.length + 1}`;
+        videoSlide.innerHTML = `
+            <video src="final_video.mp4" autoplay loop muted playsinline></video>
+            <button class="nav-btn prev-btn" onclick="changeSlide(-1)">←</button>
+        `;
+        container.appendChild(videoSlide);
+
+        // Общее число слайдов (Обложка + массив картинок + 1 видео)
+        const totalSlides = 1 + order.length + 1;
+
         function startExperience() {
-            music.play().catch(e => console.log("Музыка ждет клика:", e));
-            changeSlide(1);
+            if (!music.src) {
+                music.src = "music.mp3";
+                music.load();
+            }
+            music.play()
+                .then(() => { changeSlide(1); })
+                .catch(e => { changeSlide(1); });
         }
 
-        // Функция переключения
         function changeSlide(direction) {
-            document.getElementById(`slide-${currentSlide}`).classList.remove('active');
+            const oldSlide = document.getElementById(`slide-${currentSlide}`);
+            if (oldSlide) oldSlide.classList.remove('active');
+            
             currentSlide += direction;
-            document.getElementById(`slide-${currentSlide}`).classList.add('active');
+            
+            const newSlide = document.getElementById(`slide-${currentSlide}`);
+            if (newSlide) newSlide.classList.add('active');
+
+            if (currentSlide > 0 && music.paused) {
+                music.play().catch(o => console.log(o));
+            }
         }
     </script>
 </body>
 </html>
+
