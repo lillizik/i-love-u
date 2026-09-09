@@ -71,78 +71,45 @@
     </div>
 
     <script {nonce}>
-        // НАШ ИСПРАВЛЕННЫЙ ПОРЯДОК КАРТИНОК ИЗ ТВОЕГО СПИСКА
-        // Сюда автоматически подставятся нужные имена файлов, чтобы восстановить структуру
-        const order = [
-            4,   // Вместо 3 покажет 4
-            5,   // Вместо 4 покажет 5
-            6,   // Вместо 5 покажет 6
-            7,   // Вместо 6 покажет 7
-            8,   // Вместо 7 покажет 8
-            9,   // Вместо 8 покажет 9
-            10,  // Вместо 9 покажет 10
-            12,  // Вместо 11 покажет 12
-            11,  // Вместо 12 покажет 11
-            3,   // Вместо 13 покажет ту самую потерявшуюся 3
-            13,  // Вместо 14 покажет 13
-            14,  // Вместо 15 покажет 14
-            15,  // Вместо 16 покажет 15
-            16,  // Вместо 17 покажет 16
-            17,  // Вместо 18 покажет 17
-            19,  // Вместо 19 покажет 18 (по твоей логике сдвига)
-            18,  // Вместо 20 покажет 19
-            20,  // Вместо 21 покажет 20
-            21,  // Предпоследняя 21
-            22   // Твой красивый финал «Потому что ты — это ты»
-        ];
-
+        // У тебя ровно 23 картинки (от 0.png до 22.png) + 1 слайд под финальное видео. Всего 24.
+        const totalSlides = 24; 
+        
         let currentSlide = 0;
         const music = document.getElementById('bg-music');
         const container = document.getElementById('dynamic-slides');
 
-        // Генерируем слайды по нашему хитрому массиву порядка
-        for (let i = 0; i < order.length; i++) {
+        for (let i = 1; i < totalSlides; i++) {
             const slide = document.createElement('div');
             slide.className = 'slide';
-            slide.id = `slide-${i + 1}`; // ID слайдов пойдут по порядку: 1, 2, 3...
+            slide.id = `slide-${i}`;
             
-            slide.innerHTML = `
-                <img src="${order[i]}.png" alt="Причина">
-                <button class="nav-btn prev-btn" onclick="changeSlide(-1)">←</button>
-                <button class="nav-btn next-btn" onclick="changeSlide(1)">→</button>
+            if (i === totalSlides - 1) {
+                slide.innerHTML = `
+                    <video src="final_video.mp4" autoplay loop muted playsinline></video>
+                    <button class="nav-btn prev-btn" onclick="changeSlide(-1)">←</button>
                 `;
+            } else {
+                slide.innerHTML = `
+                    <img src="${i}.png" alt="Причина ${i}">
+                    <button class="nav-btn prev-btn" onclick="changeSlide(-1)">←</button>
+                    <button class="nav-btn next-btn" onclick="changeSlide(1)">→</button>
+                `;
+            }
             container.appendChild(slide);
         }
-
-        // Самый последний слайд — твое живое видео
-        const videoSlide = document.createElement('div');
-        videoSlide.className = 'slide';
-        videoSlide.id = `slide-${order.length + 1}`;
-        videoSlide.innerHTML = `
-            <video src="final_video.mp4" autoplay loop muted playsinline></video>
-            <button class="nav-btn prev-btn" onclick="changeSlide(-1)">←</button>
-        `;
-        container.appendChild(videoSlide);
-
-        // Общее число слайдов (Обложка + массив картинок + 1 видео)
-        const totalSlides = 1 + order.length + 1;
 
         function startExperience() {
             if (!music.src) {
                 music.src = "music.mp3";
                 music.load();
             }
-            music.play()
-                .then(() => { changeSlide(1); })
-                .catch(e => { changeSlide(1); });
+            music.play().then(() => { changeSlide(1); }).catch(e => { changeSlide(1); });
         }
 
         function changeSlide(direction) {
             const oldSlide = document.getElementById(`slide-${currentSlide}`);
             if (oldSlide) oldSlide.classList.remove('active');
-            
             currentSlide += direction;
-            
             const newSlide = document.getElementById(`slide-${currentSlide}`);
             if (newSlide) newSlide.classList.add('active');
 
