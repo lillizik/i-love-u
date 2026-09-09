@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>51 причина почему я тебя люблю 🤍</title>
+    <style>
+        body {
+            margin: 0; padding: 0;
+            background: linear-gradient(180deg, #FFE5EC 0%, #E8DBFC 100%);
+            min-height: 100vh;
+            display: flex; justify-content: center; align-items: center;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            overflow: hidden; position: relative;
+        }
+        /* Текстура матового шума */
+        body::before {
+            content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            opacity: 0.04; pointer-events: none; z-index: 10;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://w3.org id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        }
+        .phone-container {
+            width: 100vw; height: 100vh;
+            max-width: 393px; max-height: 852px;
+            position: relative; overflow: hidden;
+        }
+        .slide {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            opacity: 0; visibility: hidden;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+        .slide.active {
+            opacity: 1; visibility: visible;
+        }
+        .slide img {
+            width: 100%; height: 100%; object-fit: contain;
+        }
+        /* Кнопка-сердце на обложке */
+        .start-btn {
+            position: absolute; bottom: 12%; left: 50%;
+            transform: translateX(-50%);
+            background: none; border: none; cursor: pointer;
+            z-index: 5; display: flex; flex-direction: column; align-items: center;
+        }
+        /* Кнопки Назад / Вперед на страницах */
+        .nav-btn {
+            position: absolute; bottom: 5%; width: 60px; height: 60px;
+            background: rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            border-radius: 50%; cursor: pointer; z-index: 5;
+            display: flex; justify-content: center; align-items: center;
+            font-size: 24px; color: #2D1B36; box-shadow: 0 4px 12px rgba(45,27,54,0.05);
+        }
+        .nav-btn:active { transform: scale(0.95); }
+        .prev-btn { left: 30px; }
+        .next-btn { right: 30px; }
+    </style>
+</head>
+<body>
+
+    <!-- Аудиофайл твоей песни -->
+    <audio id="bg-music" src="music.mp3" loop></audio>
+
+    <div class="phone-container">
+        <!-- ОБЛОЖКА (Слайд 0) -->
+        <div class="slide active" id="slide-0">
+            <img src="0.png" alt="Обложка">
+            <div class="start-btn" onclick="startExperience()">
+                <!-- Невидимая кликабельная зона ровно поверх твоего сердца по центру -->
+                <div style="width: 160px; height: 160px;"></div>
+            </div>
+        </div>
+
+        <!-- Контейнер для остальных карточек -->
+        <div id="dynamic-slides"></div>
+    </div>
+
+    <script {nonce}>
+        // У тебя 23 картинки (от 0.png до 22.png), всего 23 слайда
+        const totalSlides = 23; 
+        
+        let currentSlide = 0;
+        const music = document.getElementById('bg-music');
+        const container = document.getElementById('dynamic-slides');
+
+        // Автоматически создаем слайды со стрелочками
+        for (let i = 1; i < totalSlides; i++) {
+            const slide = document.createElement('div');
+            slide.className = 'slide';
+            slide.id = `slide-${i}`;
+            
+            // Если это последняя страница (22.png), кнопки Вперед не будет
+            const nextButton = (i === totalSlides - 1) ? '' : `<button class="nav-btn next-btn" onclick="changeSlide(1)">→</button>`;
+            
+            slide.innerHTML = `
+                <img src="${i}.png" alt="Причина ${i}">
+                <button class="nav-btn prev-btn" onclick="changeSlide(-1)">←</button>
+                ${nextButton}
+            `;
+            container.appendChild(slide);
+        }
+
+        // Включение музыки по первому клику и переход к Причине 1
+        function startExperience() {
+            music.play().catch(e => console.log("Музыка ждет клика:", e));
+            changeSlide(1);
+        }
+
+        // Функция переключения
+        function changeSlide(direction) {
+            document.getElementById(`slide-${currentSlide}`).classList.remove('active');
+            currentSlide += direction;
+            document.getElementById(`slide-${currentSlide}`).classList.add('active');
+        }
+    </script>
+</body>
+</html>
